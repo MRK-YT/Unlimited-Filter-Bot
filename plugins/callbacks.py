@@ -95,7 +95,7 @@ async def cb_handler(client, query):
 
     elif query.data == "close_data":
         await query.message.delete()
-        
+
 
     elif query.data == "delallconfirm":
         userid = query.from_user.id
@@ -118,7 +118,7 @@ async def cb_handler(client, query):
                 )
                 return
 
-        elif (chat_type == "group") or (chat_type == "supergroup"):
+        elif chat_type in ["group", "supergroup"]:
             grp_id = query.message.chat.id
             title = query.message.chat.title
 
@@ -130,16 +130,16 @@ async def cb_handler(client, query):
             await del_all(query.message, grp_id, title)
         else:
             await query.answer("You need to be Group Owner or an Auth User to do that!",show_alert=True)
-    
+
     elif query.data == "delallcancel":
         userid = query.from_user.id
         chat_type = query.message.chat.type
-        
+
         if chat_type == "private":
             await query.message.reply_to_message.delete()
             await query.message.delete()
 
-        elif (chat_type == "group") or (chat_type == "supergroup"):
+        elif chat_type in ["group", "supergroup"]:
             grp_id = query.message.chat.id
             st = await client.get_chat_member(grp_id, userid)
             if (st.status == "creator") or (str(userid) in Config.AUTH_USERS):
@@ -194,14 +194,9 @@ async def cb_handler(client, query):
                 f"Connected to **{title}**",
                 parse_mode="md"
             )
-            return
         else:
-            await query.message.edit_text(
-                f"Some error occured!!",
-                parse_mode="md"
-            )
-            return
-
+            await query.message.edit_text('Some error occured!!', parse_mode="md")
+        return
     elif "disconnect" in query.data:
         await query.answer()
 
@@ -215,13 +210,9 @@ async def cb_handler(client, query):
                 f"Disconnected from **{title}**",
                 parse_mode="md"
             )
-            return
         else:
-            await query.message.edit_text(
-                f"Some error occured!!",
-                parse_mode="md"
-            )
-            return
+            await query.message.edit_text('Some error occured!!', parse_mode="md")
+        return
     elif "deletecb" in query.data:
         await query.answer()
 
@@ -234,14 +225,9 @@ async def cb_handler(client, query):
             await query.message.edit_text(
                 "Successfully deleted connection"
             )
-            return
         else:
-            await query.message.edit_text(
-                f"Some error occured!!",
-                parse_mode="md"
-            )
-            return
-    
+            await query.message.edit_text('Some error occured!!', parse_mode="md")
+        return
     elif query.data == "backcb":
         await query.answer()
 
@@ -259,10 +245,7 @@ async def cb_handler(client, query):
                 ttl = await client.get_chat(int(groupid))
                 title = ttl.title
                 active = await if_active(str(userid), str(groupid))
-                if active:
-                    act = " - ACTIVE"
-                else:
-                    act = ""
+                act = " - ACTIVE" if active else ""
                 buttons.append(
                     [
                         InlineKeyboardButton(

@@ -47,7 +47,7 @@ async def addfilter(client, message):
             await message.reply_text("I'm not connected to any groups!", quote=True)
             return
 
-    elif (chat_type == "group") or (chat_type == "supergroup"):
+    elif chat_type in ["group", "supergroup"]:
         grp_id = message.chat.id
         title = message.chat.title
 
@@ -55,17 +55,21 @@ async def addfilter(client, message):
         return
 
     st = await client.get_chat_member(grp_id, userid)
-    if not ((st.status == "administrator") or (st.status == "creator") or (str(userid) in Config.AUTH_USERS)):
+    if (
+        st.status != "administrator"
+        and st.status != "creator"
+        and str(userid) not in Config.AUTH_USERS
+    ):
         return
-        
+
 
     if len(args) < 2:
         await message.reply_text("Command Incomplete :(", quote=True)
         return
-    
+
     extracted = split_quotes(args[1])
     text = extracted[0].lower()
-   
+
     if not message.reply_to_message and len(extracted) < 2:
         await message.reply_text("Add some content to save your filter!", quote=True)
         return
@@ -126,7 +130,7 @@ async def addfilter(client, message):
             reply_text = ""
             btn = "[]"
             alert = None
-   
+
     elif message.reply_to_message and message.reply_to_message.document:
         try:
             fileid = message.reply_to_message.document.file_id
@@ -165,7 +169,7 @@ async def addfilter(client, message):
 
     else:
         return
-    
+
     await add_filter(grp_id, text, reply_text, btn, fileid, alert)
 
     await message.reply_text(
@@ -195,7 +199,7 @@ async def get_all(client, message):
             await message.reply_text("I'm not connected to any groups!", quote=True)
             return
 
-    elif (chat_type == "group") or (chat_type == "supergroup"):
+    elif chat_type in ["group", "supergroup"]:
         grp_id = message.chat.id
         title = message.chat.title
 
@@ -203,7 +207,11 @@ async def get_all(client, message):
         return
 
     st = await client.get_chat_member(grp_id, userid)
-    if not ((st.status == "administrator") or (st.status == "creator") or (str(userid) in Config.AUTH_USERS)):
+    if (
+        st.status != "administrator"
+        and st.status != "creator"
+        and str(userid) not in Config.AUTH_USERS
+    ):
         return
 
     texts = await get_filters(grp_id)
@@ -213,7 +221,7 @@ async def get_all(client, message):
 
         for text in texts:
             keywords = " ×  `{}`\n".format(text)
-            
+
             filterlist += keywords
 
         if len(filterlist) > 4096:
@@ -251,7 +259,7 @@ async def deletefilter(client, message):
         else:
             await message.reply_text("I'm not connected to any groups!", quote=True)
 
-    elif (chat_type == "group") or (chat_type == "supergroup"):
+    elif chat_type in ["group", "supergroup"]:
         grp_id = message.chat.id
         title = message.chat.title
 
@@ -259,7 +267,11 @@ async def deletefilter(client, message):
         return
 
     st = await client.get_chat_member(grp_id, userid)
-    if not ((st.status == "administrator") or (st.status == "creator") or (str(userid) in Config.AUTH_USERS)):
+    if (
+        st.status != "administrator"
+        and st.status != "creator"
+        and str(userid) not in Config.AUTH_USERS
+    ):
         return
 
     try:
@@ -297,7 +309,7 @@ async def delallconfirm(client, message):
             await message.reply_text("I'm not connected to any groups!", quote=True)
             return
 
-    elif (chat_type == "group") or (chat_type == "supergroup"):
+    elif chat_type in ["group", "supergroup"]:
         grp_id = message.chat.id
         title = message.chat.title
 
@@ -342,24 +354,22 @@ async def give_filter(client,message):
                                 disable_web_page_preview=True,
                                 reply_markup=InlineKeyboardMarkup(button)
                             )
+                    elif btn == "[]":
+                        await message.reply_cached_media(
+                            fileid,
+                            caption=reply_text or ""
+                        )
                     else:
-                        if btn == "[]":
-                            await message.reply_cached_media(
-                                fileid,
-                                caption=reply_text or ""
-                            )
-                        else:
-                            button = eval(btn) 
-                            await message.reply_cached_media(
-                                fileid,
-                                caption=reply_text or "",
-                                reply_markup=InlineKeyboardMarkup(button)
-                            )
+                        button = eval(btn) 
+                        await message.reply_cached_media(
+                            fileid,
+                            caption=reply_text or "",
+                            reply_markup=InlineKeyboardMarkup(button)
+                        )
                 except Exception as e:
                     print(e)
-                    pass
                 break 
-                
+
     if Config.SAVE_USER == "yes":
         try:
             await add_user(

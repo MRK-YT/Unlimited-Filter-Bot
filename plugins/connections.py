@@ -29,14 +29,16 @@ async def addconnection(client,message):
             )
             return
 
-    elif (chat_type == "group") or (chat_type == "supergroup"):
+    elif chat_type in ["group", "supergroup"]:
         group_id = message.chat.id
 
     try:
         st = await client.get_chat_member(group_id, userid)
-        if (st.status == "administrator") or (st.status == "creator") or (str(userid) in Config.AUTH_USERS):
-            pass
-        else:
+        if (
+            st.status != "administrator"
+            and st.status != "creator"
+            and str(userid) not in Config.AUTH_USERS
+        ):
             await message.reply_text("You should be an admin in Given group!", quote=True)
             return
     except Exception as e:
@@ -60,7 +62,7 @@ async def addconnection(client,message):
                     quote=True,
                     parse_mode="md"
                 )
-                if (chat_type == "group") or (chat_type == "supergroup"):
+                if chat_type in ["group", "supergroup"]:
                     await client.send_message(
                         userid,
                         f"Connected to **{title}** !",
@@ -90,11 +92,15 @@ async def deleteconnection(client,message):
     if chat_type == "private":
         await message.reply_text("Run /connections to view or disconnect from groups!", quote=True)
 
-    elif (chat_type == "group") or (chat_type == "supergroup"):
+    elif chat_type in ["group", "supergroup"]:
         group_id = message.chat.id
 
         st = await client.get_chat_member(group_id, userid)
-        if not ((st.status == "administrator") or (st.status == "creator") or (str(userid) in Config.AUTH_USERS)):
+        if (
+            st.status != "administrator"
+            and st.status != "creator"
+            and str(userid) not in Config.AUTH_USERS
+        ):
             return
 
         delcon = await delete_connection(str(userid), str(group_id))
@@ -121,10 +127,7 @@ async def connections(client,message):
             ttl = await client.get_chat(int(groupid))
             title = ttl.title
             active = await if_active(str(userid), str(groupid))
-            if active:
-                act = " - ACTIVE"
-            else:
-                act = ""
+            act = " - ACTIVE" if active else ""
             buttons.append(
                 [
                     InlineKeyboardButton(

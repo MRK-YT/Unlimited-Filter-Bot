@@ -1,7 +1,9 @@
 import os
 import time
 
-class Config(object):
+
+
+class Config((object)):
 
     # Get a bot token from botfather
     TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
@@ -13,8 +15,8 @@ class Config(object):
 
     # Get from my.telegram.org (or @UseTGXBot)
     API_HASH = os.environ.get("API_HASH", "")
-    
-    
+
+
     # Database URL from https://cloud.mongodb.com/
     DATABASE_URI = os.environ.get("DATABASE_URI", "")
 
@@ -24,7 +26,7 @@ class Config(object):
 
 
     # ID of users that can use the bot commands
-    AUTH_USERS = set(str(x) for x in os.environ.get("AUTH_USERS", "").split())
+    AUTH_USERS = {str(x) for x in os.environ.get("AUTH_USERS", "").split()}
 
 
     # To save user details (Usefull for getting userinfo and total user counts)

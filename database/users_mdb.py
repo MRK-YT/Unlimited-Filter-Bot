@@ -26,8 +26,7 @@ async def add_user(id, username, name, dcid):
 
 
 async def all_users():
-    count = mycol.count()
-    return count
+    return mycol.count()
 
 
 async def find_user(id):

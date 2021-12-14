@@ -32,7 +32,7 @@ async def showid(client, message):
             parse_mode="md",
             quote=True
         )
-    elif (chat_type == "group") or (chat_type == "supergroup"):
+    elif chat_type in ["group", "supergroup"]:
         user_id = message.from_user.id
         chat_id = message.chat.id
         if message.reply_to_message:
@@ -52,10 +52,8 @@ async def showinfo(client, message):
         cmd, id = message.text.split(" ", 1)
     except:
         id = False
-        pass
-
     if id:
-        if (len(id) == 10 or len(id) == 9):
+        if len(id) in [10, 9]:
             try:
                 checkid = int(id)
             except:
@@ -75,30 +73,23 @@ async def showinfo(client, message):
                 dcid = user.dc_id
             except:
                 name = False
-                pass
-
         if not name:
             await message.reply_text("__USER Details not found!!__", quote=True, parse_mode="md")
             return
+    elif message.reply_to_message:
+        name = str(message.reply_to_message.from_user.first_name\
+                + (message.reply_to_message.from_user.last_name or ""))
+        id = message.reply_to_message.from_user.id
+        username = message.reply_to_message.from_user.username
+        dcid = message.reply_to_message.from_user.dc_id
     else:
-        if message.reply_to_message:
-            name = str(message.reply_to_message.from_user.first_name\
-                    + (message.reply_to_message.from_user.last_name or ""))
-            id = message.reply_to_message.from_user.id
-            username = message.reply_to_message.from_user.username
-            dcid = message.reply_to_message.from_user.dc_id
-        else:
-            name = str(message.from_user.first_name\
-                    + (message.from_user.last_name or ""))
-            id = message.from_user.id
-            username = message.from_user.username
-            dcid = message.from_user.dc_id
-    
-    if not str(username) == "None":
-        user_name = f"@{username}"
-    else:
-        user_name = "none"
+        name = str(message.from_user.first_name\
+                + (message.from_user.last_name or ""))
+        id = message.from_user.id
+        username = message.from_user.username
+        dcid = message.from_user.dc_id
 
+    user_name = f"@{username}" if str(username) != "None" else "none"
     await message.reply_text(
         f"<b>👨‍💼Name</b> : {name}\n\n"
         f"<b>📃User ID</b> : <code>{id}</code>\n\n"
